@@ -1,5 +1,6 @@
 #include <iostream>
 #include <ifstream>
+#include <string>
 
 using namespace std;
 
@@ -10,16 +11,21 @@ int main() {
 
   /*COLOQUE SEU CODIGO AQUI*/
   //open file
+  ifstream file;
+  file.open("xmlfilename");
 
   //start reading
-  std::string tag_atual;   // <- include
-  bool tag_abre = false, tag_fecha = false;
+  std::string tag_atual;
+  std::string[] pilha = new string[256];
+
+  //reading logic
+  bool opening_tag = false, closing_tag = false;
   while (NAO CHEGA O FIM) {
     if (char_lido == '<'){
-      bool sai = false;
-      while(!sai) {
+      bool continue_reading = true;
+      while(continue_reading) {
 
-        if (proximo char = `/`) {
+        if (proximo char = '/') {
           tag_fecha = true;
           tag_abre = false;
         } else {
@@ -28,19 +34,19 @@ int main() {
         }
 
         do {
-          tag_atual->push(char_lido);
+          tag_atual += char_lido;
         } while (char_lido != '>');
 
-        // insere tag_atual na pilha
+        // insert read tag on the stack
 
-        sai = true; //sai do while, pois acabou a tag
+        continue_reading = false; //sai do while, pois acabou a tag
       }
 
-      //saiu do while
-      //compara com a string anterior da pilha (compara retirando o /)
+      //out of the while
+      //compares last read string
 
-      //se for igual, continua
-      //se nao for igual, acusa erro
+      //if both the tags are equal, continue program
+      //if not, shows error
 
     } else {
       //volta a ler
@@ -48,5 +54,6 @@ int main() {
 }
   std::cout << xmlfilename << std::endl;  // esta linha deve ser removida
 
+  file.close();
   return 0;
 }
