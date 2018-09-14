@@ -15,31 +15,32 @@ int main() {
   file.open("xmlfilename");
 
   //start reading
-  std::string tag_atual;
+  std::string tag;
   std::string[] pilha = new string[256];
 
   //reading logic
   bool opening_tag = false, closing_tag = false;
   while (NAO CHEGA O FIM) {
-    if (char_lido == '<'){
+    read_char = //reads char
+    if (read_char == '<'){
       bool continue_reading = true;
       while(continue_reading) {
 
         if (proximo char = '/') {
-          tag_fecha = true;
-          tag_abre = false;
+          closing_tag = true;
+          opening_tag = false;
         } else {
-          tag_abre = true;
-          tag_fecha = false;
+          opening_tag = true;
+          closing_tag = false;
         }
 
         do {
-          tag_atual += char_lido;
-        } while (char_lido != '>');
+          tag += read_char;
+        } while (read_char != '>');
 
         // insert read tag on the stack
 
-        continue_reading = false; //sai do while, pois acabou a tag
+        continue_reading = false; //exits while, tag ended
       }
 
       //out of the while
@@ -49,7 +50,7 @@ int main() {
       //if not, shows error
 
     } else {
-      //volta a ler
+      //does nothing
     }
 }
   std::cout << xmlfilename << std::endl;  // esta linha deve ser removida
