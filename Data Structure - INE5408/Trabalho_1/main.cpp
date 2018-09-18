@@ -5,6 +5,30 @@
 
 using namespace std;
 
+/*This method, when called, opens the file and gets the information
+on it, turning into a string and returning that.*/
+string fileToString(string xmlfilename){
+  string content;
+  char c;
+
+  ifstream file;
+  file.open(*xmlfilename);
+
+  if (file.is_open()) {
+    while (file.get(c)) {
+      content += c;
+    }
+  } else {
+    cout << "Error opening file";
+    exit(1);
+  }
+
+  file.close();
+  return content;
+}
+
+
+
 int main() {
   char xmlfilename[100];
 
@@ -13,7 +37,7 @@ int main() {
   /*COLOQUE SEU CODIGO AQUI*/
   //  open file
   ifstream file;
-  file.open("dataset01.xml");
+  file.open(*xmlfilename);
   char read_char;
   if (file.is_open()) {
     //  start reading
@@ -55,8 +79,9 @@ int main() {
               so both of them should be removed. */
             } else {
               /* The closing tag doesn't corresponds to the last opening
-              tag, so there is an error! */
+              tag, so there is an error! The program exits */
               printf("No opening tag found for %s", tag);
+              exit(2);
             }
           }
 
