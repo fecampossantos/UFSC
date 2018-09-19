@@ -4,45 +4,47 @@
 #include "pedido.h"
 #include "tarefas.h"
 
+
+/**/
 extern void cozinha_init(int cozinheiros, int bocas, int frigideiras, int garcons, int tam_balcao);
 extern void cozinha_destroy();
 extern void processar_pedido(pedido_t p);
+void preparar_sopa();
+void preparar_carne();
+void preparar_spaghetti();
 
-void *cozinha_init(){
-  /**/
+void cozinha_init(int cozinheiros, int bocas, int frigideiras, int garcons, int tam_balcao){
+  //Cria os buffers
 
 }
 
-void *processar_pedido(p){
+void processar_pedido(pedido_t p){
   /**/
-  char* name = pedido_prato_to_name(p.prato);
-  switch(name){
-    case "PEDIDO_SOPA":
-      cozinhar_sopa();
-      break;
-    case "PEDIDO_CARNE":
-      cozinhar_carne();
-      break;
-    case "PEDIDO_SPAGHETTI":
-      cozinhar_spaghetti();
-      break;
+  const char* name = pedido_prato_to_name(p.prato);
+  if (strcmp(name,"PEDIDO_SOPA") == 0){
+    preparar_sopa(p);
   }
+  if (strcmp(name, "PEDIDO_CARNE") == 0){
+    preparar_carne(p);
+  }
+  if (strcmp(name, "PEDIDO_SPAGHETTI") == 0){
+    preparar_spaghetti(p);
+  }
+}
+
+void cozinha_destroy(){
+  //Free buffers, delete threads and destroy semaphores
 
 }
 
-void *cozinha_destroy(){
-  /*Free buffers, delete threads and destroy semaphores*/
-
-}
-
-void* cozinhar_carne(){
+void preparar_carne(pedido_t p){
   /**/
-  carne_t carne = create_carne();
+  carne_t* carne = create_carne();
   cortar_carne(carne);
   temperar_carne(carne);
   grelhar_carne(carne);
 
-  prato_t prato = create_prato();
+  prato_t* prato = create_prato(p);
   empratar_carne(carne, prato);
 
   notificar_prato_no_balcao(prato);
@@ -55,18 +57,19 @@ void* cozinhar_carne(){
 
 }
 
-void* cozinhar_spaghetti(){
+void preparar_spaghetti(pedido_t p){
   /**/
-  molho_t molho = create_molho();
-  agua_t agua = create_agua();
-  spaghetti_t spaghetti = create_spaghetti();
-  bacon_t bacon = create_bacon();
-  prato_t prato = create_prato();
+  molho_t* molho = create_molho();
+  agua_t* agua = create_agua();
+  spaghetti_t* spaghetti = create_spaghetti();
+  bacon_t* bacon = create_bacon();
 
   esquentar_molho(molho);
   ferver_agua(agua);
-  cozinhar_spaghetti(spaghetti);
+  cozinhar_spaghetti(spaghetti, agua);
   dourar_bacon(bacon);
+
+  prato_t* prato = create_prato(p);
   empratar_spaghetti(spaghetti, molho, bacon, prato);
 
   notificar_prato_no_balcao(prato);
@@ -82,16 +85,17 @@ void* cozinhar_spaghetti(){
   destroy_spaghetti(spaghetti);
 }
 
-void* cozinhar_sopa(){
+void preparar_sopa(pedido_t p){
   /**/
-  agua_t agua = create_agua();
-  legumes_t legumes = create_legumes();
+  agua_t* agua = create_agua();
+  legumes_t* legumes = create_legumes();
 
   ferver_agua(agua);
   cortar_legumes(legumes);
-  preparar_caldo(agua);
-  cozinhar_legumes(legumes);
+  caldo_t* caldo = preparar_caldo(agua);
+  cozinhar_legumes(legumes, caldo);
 
+  prato_t* prato = create_prato(p);
   notificar_prato_no_balcao(prato);
   //inserir prato no buffer do balcao
 
@@ -106,4 +110,4 @@ void* cozinhar_sopa(){
 
 
 
-#endif /*__COZINHA_H__*/
+#endif /* __COZINHA_H__ */
