@@ -26,7 +26,7 @@ int parse_gt_zero(const char* buf, const char* name, int* res) {
         return 0;
     }
     if (*res <= 0) {
-        fprintf(stderr, "Esperava um valor maior que zero para %s, leu: %d\n", 
+        fprintf(stderr, "Esperava um valor maior que zero para %s, leu: %d\n",
                 name, *res);
         return 0;
     }
@@ -39,7 +39,7 @@ void check_missing(int value, const char* name) {
 }
 
 int main(int argc, char** argv) {
-    int bocas_total = 0, bocas = 4, frigideiras = 2, fogoes = 2, 
+    int bocas_total = 0, bocas = 4, frigideiras = 2, fogoes = 2,
         cozinheiros = 6, garcons = 1, balcao = 5, c = 0;
     while (c >= 0) {
         int long_idx;
@@ -47,22 +47,22 @@ int main(int argc, char** argv) {
         if (c == 0) c = cmd_opts[long_idx].val;
 
         switch (c) {
-        case 'c': 
+        case 'c':
             if (!parse_gt_zero(optarg, argv[optind-1], &cozinheiros)) abort();
             break;
-        case 'b': 
+        case 'b':
             if (!parse_gt_zero(optarg, argv[optind-1], &bocas      )) abort();
             break;
-        case 'f': 
+        case 'f':
             if (!parse_gt_zero(optarg, argv[optind-1], &fogoes     )) abort();
             break;
-        case 'r': 
+        case 'r':
             if (!parse_gt_zero(optarg, argv[optind-1], &frigideiras)) abort();
             break;
-        case 'g': 
+        case 'g':
             if (!parse_gt_zero(optarg, argv[optind-1], &garcons    )) abort();
             break;
-        case 'a': 
+        case 'a':
             if (!parse_gt_zero(optarg, argv[optind-1], &balcao     )) abort();
             break;
         case -1:
@@ -79,8 +79,8 @@ int main(int argc, char** argv) {
     check_missing(frigideiras, "frigideiras");
     check_missing(garcons, "garcons");
     check_missing(balcao, "balcao");
-    
-    cozinha_init(cozinheiros, bocas_total, frigideiras, 
+
+    cozinha_init(cozinheiros, bocas_total, frigideiras,
                  garcons, balcao);
 
     char* buf = (char*)malloc(4096);
@@ -88,9 +88,9 @@ int main(int argc, char** argv) {
     int ret = 0;
     while((ret = scanf("%4095s", buf)) > 0) {
         pedido_t p = {next_id++, pedido_prato_from_name(buf)};
-        if (!p.prato) 
+        if (!p.prato)
             fprintf(stderr, "Pedido inválido descartado: \"%s\"\n", buf);
-        else 
+        else
             processar_pedido(p);
     }
     if (ret != EOF) {
@@ -102,4 +102,11 @@ int main(int argc, char** argv) {
     cozinha_destroy();
 
     return 0;
+
+    /*
+      Garantir que, após o fim do main():
+        Não haja nenhuma outra thread em execução;
+        Não exista nenhum pedido em um estágio intermediário de produção ou já produzido mas não entregue;
+        Não podem haver memory leaks (use o AddressSanitizer para confirmar).
+    */
 }
