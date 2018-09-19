@@ -11,7 +11,7 @@ typedef struct {
 } agua_t;
 
 /* Nesse restaurante a água não é pega da torneira, ela é criada.
-   Retorna um ponteiro para um objeto agua_t alocado com malloc(). 
+   Retorna um ponteiro para um objeto agua_t alocado com malloc().
    Use destroy_agua(). Quando não precisar mais da água. */
 extern agua_t* create_agua();
 /** Ferve a água. Bloqueante, só retorna quando a água estiver fervida  */
@@ -26,14 +26,14 @@ typedef struct {
     unsigned coisas_len;
 } prato_t;
 
-/** Cria um prato onde receitas podem ser empratadas. 
+/** Cria um prato onde receitas podem ser empratadas.
     Cada receita tem um método empratar_* correspondente */
 extern prato_t* create_prato(pedido_t pedido);
 
 /* Garçom leva pedido para quem pediu. Chama destroy_prato()
    IMPORTANTE: Essa função deve ser chamada para todo prato! */
 extern void entregar_pedido(prato_t* prato);
-/* Notifica que pedido está no balcão 
+/* Notifica que pedido está no balcão
    IMPORTANTE: Essa função deve ser chamada para todo prato! */
 extern void notificar_prato_no_balcao(prato_t* prato);
 
@@ -74,7 +74,7 @@ extern spaghetti_t* create_spaghetti();
 extern void cozinhar_spaghetti(spaghetti_t* spaghetti, agua_t* agua);
 extern void destroy_spaghetti(spaghetti_t* spaghetti);
 
-extern void empratar_spaghetti(spaghetti_t* spaghetti, molho_t* molho, 
+extern void empratar_spaghetti(spaghetti_t* spaghetti, molho_t* molho,
                                bacon_t* bacon, prato_t* prato);
 
 
