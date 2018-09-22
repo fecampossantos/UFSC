@@ -5,6 +5,7 @@
 #include <string.h>
 #include "pedido.h"
 #include "cozinha.h"
+#include <pthread.h>
 
 static struct option cmd_opts[] = {
     {"cozinheiros", required_argument, 0, 'c'},
@@ -90,8 +91,11 @@ int main(int argc, char** argv) {
         pedido_t p = {next_id++, pedido_prato_from_name(buf)};
         if (!p.prato)
             fprintf(stderr, "Pedido inválido descartado: \"%s\"\n", buf);
-        else
-            processar_pedido(p);
+        else {
+          pthread_t thread;
+          pthread_create(&thread, NULL, processar_pedido, &p);
+        }
+            //processar_pedido(p);
     }
     if (ret != EOF) {
         perror("Erro lendo pedidos de stdin:");
