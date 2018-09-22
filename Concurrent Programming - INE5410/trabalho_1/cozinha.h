@@ -1,5 +1,5 @@
-#ifndef __COZINHA_H__
-#define __COZINHA_H__
+#ifndef _COZINHA_H_
+#define _COZINHA_H_
 
 #include "pedido.h"
 #include "tarefas.h"
@@ -8,7 +8,7 @@
 /**/
 extern void cozinha_init(int cozinheiros, int bocas, int frigideiras, int garcons, int tam_balcao);
 extern void cozinha_destroy();
-extern void processar_pedido(pedido_t p);
+extern void* processar_pedido(void* p);
 void preparar_sopa();
 void preparar_carne();
 void preparar_spaghetti();
@@ -18,18 +18,21 @@ void cozinha_init(int cozinheiros, int bocas, int frigideiras, int garcons, int 
 
 }
 
-void processar_pedido(pedido_t p){
+void* processar_pedido(void* p){
   /**/
-  const char* name = pedido_prato_to_name(p.prato);
-  if (strcmp(name,"PEDIDO_SOPA") == 0){
+  pedido_t* pp = (pedido_t*)p;
+  const char* name = pedido_prato_to_name(pp->prato);
+  if (strcmp(name,"SOPA") == 0){
     preparar_sopa(p);
   }
-  if (strcmp(name, "PEDIDO_CARNE") == 0){
+  if (strcmp(name, "CARNE") == 0){
     preparar_carne(p);
+
   }
-  if (strcmp(name, "PEDIDO_SPAGHETTI") == 0){
+  if (strcmp(name, "SPAGHETTI") == 0){
     preparar_spaghetti(p);
   }
+  return NULL;
 }
 
 void cozinha_destroy(){
@@ -46,7 +49,6 @@ void preparar_carne(pedido_t p){
 
   prato_t* prato = create_prato(p);
   empratar_carne(carne, prato);
-
   notificar_prato_no_balcao(prato);
   //inserir prato no buffer do balcao
 
@@ -68,7 +70,6 @@ void preparar_spaghetti(pedido_t p){
   ferver_agua(agua);
   cozinhar_spaghetti(spaghetti, agua);
   dourar_bacon(bacon);
-
   prato_t* prato = create_prato(p);
   empratar_spaghetti(spaghetti, molho, bacon, prato);
 
@@ -110,4 +111,4 @@ void preparar_sopa(pedido_t p){
 
 
 
-#endif /* __COZINHA_H__ */
+#endif /* _COZINHA_H_ */
