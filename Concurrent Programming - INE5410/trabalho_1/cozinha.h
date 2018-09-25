@@ -3,7 +3,12 @@
 
 #include "pedido.h"
 #include "tarefas.h"
+#include <semaphore.h>
 
+sem_t sem_cozinheiros;
+sem_t sem_bocas;
+sem_t sem_frigideiras;
+sem_t sem_garcons;
 
 /**/
 extern void cozinha_init(int cozinheiros, int bocas, int frigideiras, int garcons, int tam_balcao);
@@ -15,6 +20,10 @@ void preparar_spaghetti();
 
 void cozinha_init(int cozinheiros, int bocas, int frigideiras, int garcons, int tam_balcao){
   //Cria os buffers
+  sem_init(&sem_cozinheiros, 0, cozinheiros);
+  sem_init(&sem_bocas, 0, bocas);
+  sem_init(&sem_frigideiras, 0, frigideiras);
+  sem_init(&sem_garcons, 0, garcons);
 
 }
 
@@ -37,6 +46,10 @@ void* processar_pedido(void* p){
 
 void cozinha_destroy(){
   //Free buffers, delete threads and destroy semaphores
+  sem_destroy(&cozinheiros);
+  sem_destroy(&bocas);
+  sem_destroy(&frigideiras);
+  sem_destroy(&garcons);
 
 }
 
@@ -44,35 +57,34 @@ void preparar_carne(pedido_t p){
   /**/
   carne_t* carne = create_carne();
 
-  //sem_wait(&cozinheiros);                 //espera por um cozinheiro livre
+  sem_wait(&sem_cozinheiros);                 //espera por um cozinheiro livre
 
   cortar_carne(carne);    //coloca cozinheiro como ocupado (DE)
 
   temperar_carne(carne);  //coloca cozinheiro como ocupado (DE)
 
-  //sem_wait(&fogoes);
-  //sem_wait(&frigideiras);
+  sem_wait(&sem_bocas);
+  sem_wait(&sem_frigideiras);
   grelhar_carne(carne);         //coloca cozinheiro como ocupado (DE)
-  //sem_post(&frigideiras);     //NESSE MOMENTO, TOMAR CUIDADO COM DEADLOCK
-  //sem_post(&fogoes);
+  sem_post(&sem_frigideiras);     //NESSE MOMENTO, TOMAR CUIDADO COM DEADLOCK
+  sem_post(&sem_bocas);
 
 
   prato_t* prato = create_prato(p);
   empratar_carne(carne, prato);      //coloca cozinheiro como ocupado (DE)
   notificar_prato_no_balcao(prato);
 
-  //sem_post(&cozinheiros);
-
-
   //inserir prato no buffer do balcao
 
-  //sem_wait(&garcons);
+  sem_post(&sem_cozinheiros);
+
+  sem_wait(&sem_garcons);
   entregar_pedido(prato);
-  //sem_post(&garcons);
+  sem_post(&sem_garcons);
 
 
-  destroy_carne(carne);
-  //destroy_prato(prato);
+  //destroy_carne(carne);
+  destroy_prato(prato);
 
 
 }
@@ -84,41 +96,44 @@ void preparar_spaghetti(pedido_t p){
   spaghetti_t* spaghetti = create_spaghetti();
   bacon_t* bacon = create_bacon();
 
-  //sem_wait(&cozinheiros);
+  sem_wait(&sem_cozinheiros);
 
-  //sem_wait(&bocas);
+  sem_wait(&sem_bocas);
   esquentar_molho(molho);  //cozinheiro esperando
-  //sem_post(&bocas);
+  sem_post(&sem_bocas);
 
-  //sem_wait(&bocas);
+  sem_wait(&sem_bocas);
   ferver_agua(agua);      //cozinheiro esperando
-  //sem_post(&bocas);
+  sem_post(&sem_bocas);
 
-  //sem_wait(&bocas);
+  sem_wait(&sem_bocas);//inserir prato no buffer do balcao
   cozinhar_spaghetti(spaghetti, agua);      //cozinheiro esperando
-  //sem_post(&bocas);
+  sem_post(&sem_bocas);
 
-  //sem_wait(&bocas);
+  sem_wait(&sem_bocas);
   dourar_bacon(bacon);              //
-  //sem_post(&bocas);
+  sem_post(&sem_bocas);
 
 
   prato_t* prato = create_prato(p);
   empratar_spaghetti(spaghetti, molho, bacon, prato);   //cozinheiro ocupado
 
-  notificar_prato_no_balcao(prato);
   //inserir prato no buffer do balcao
+  notificar_prato_no_balcao(prato);
 
-  //sem_post(&cozinheiros);
+  sem_post(&sem_cozinheiros);
 
   //espera um garcom ficar livre
+  sem_wait(&sem_garcons);
   entregar_pedido(prato);
+  sem_post(&sem_garcons);
 
-  destroy_agua(agua);
+  //destroy_agua(agua);
   //destroy_prato(prato);
-  destroy_molho(molho);
-  destroy_bacon(bacon);
-  destroy_spaghetti(spaghetti);
+  //destroy_molho(molho);
+  //destroy_bacon(bacon);
+  //destroy_spaghetti(spaghetti);
+  destroy_prato(prato);
 }
 
 void preparar_sopa(pedido_t p){
@@ -126,37 +141,37 @@ void preparar_sopa(pedido_t p){
   agua_t* agua = create_agua();
   legumes_t* legumes = create_legumes();
 
-  //sem_wait(&cozinheiros);
+  sem_wait(&sem_cozinheiros);
 
-  //sem_wait(&bocas);
+  sem_wait(&sem_bocas);
   ferver_agua(agua);   //cozinheiro esperando
-  //sem_post(&bocas);
+  sem_post(&sem_bocas);
 
   cortar_legumes(legumes);  //cozinheiro ocupado
 
-  //sem_wait(&bocas);
+  sem_wait(&sem_bocas);
   caldo_t* caldo = preparar_caldo(agua);  //cozinheiro esperando
-  //sem_post(&bocas);
+  sem_post(&sem_bocas);
 
-  //sem_wait(&bocas);
+  sem_wait(&sem_bocas);
   cozinhar_legumes(legumes, caldo);    //cozinheiro esperando
-  //sem_post(&bocas);
+  sem_post(&sem_bocas);
 
   prato_t* prato = create_prato(p);
   notificar_prato_no_balcao(prato);
   //inserir prato no buffer do balcao
 
-  //sem_post(&cozinheiros);
+  sem_post(&sem_cozinheiros);
 
 
-  //sem_wait(&garcons);
+  sem_wait(&sem_garcons);
   entregar_pedido(prato);
-  //sem_post(&garcons);
+  sem_post(&sem_garcons);
 
   //destroy_agua(agua);
-  //destroy_prato(prato);
-  destroy_legumes(legumes);
-  destroy_caldo(caldo);
+  destroy_prato(prato);
+  //destroy_legumes(legumes);
+  //destroy_caldo(caldo);
 }
 
 
