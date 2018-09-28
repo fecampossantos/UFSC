@@ -14,9 +14,9 @@ sem_t sem_garcons;
 extern void cozinha_init(int cozinheiros, int bocas, int frigideiras, int garcons, int tam_balcao);
 extern void cozinha_destroy();
 extern void* processar_pedido(void* p);
-void preparar_sopa();
-void preparar_carne();
-void preparar_spaghetti();
+void preparar_sopa(pedido_t p);
+void preparar_carne(pedido_t p);
+void preparar_spaghetti(pedido_t p);
 
 void cozinha_init(int cozinheiros, int bocas, int frigideiras, int garcons, int tam_balcao){
   //Cria os buffers
@@ -29,27 +29,27 @@ void cozinha_init(int cozinheiros, int bocas, int frigideiras, int garcons, int 
 
 void* processar_pedido(void* p){
   /**/
-  pedido_t* pp = (pedido_t*)p;
-  const char* name = pedido_prato_to_name(pp->prato);
+  pedido_t pp = *((pedido_t*)p);
+  const char* name = pedido_prato_to_name(pp.prato);
   if (strcmp(name,"SOPA") == 0){
-    preparar_sopa(p);
+    preparar_sopa(pp);
   }
   if (strcmp(name, "CARNE") == 0){
-    preparar_carne(p);
+    preparar_carne(pp);
 
   }
   if (strcmp(name, "SPAGHETTI") == 0){
-    preparar_spaghetti(p);
+    preparar_spaghetti(pp);
   }
   return NULL;
 }
 
 void cozinha_destroy(){
   //Free buffers, delete threads and destroy semaphores
-  sem_destroy(&cozinheiros);
-  sem_destroy(&bocas);
-  sem_destroy(&frigideiras);
-  sem_destroy(&garcons);
+  sem_destroy(&sem_cozinheiros);
+  sem_destroy(&sem_bocas);
+  sem_destroy(&sem_frigideiras);
+  sem_destroy(&sem_garcons);
 
 }
 
@@ -84,7 +84,7 @@ void preparar_carne(pedido_t p){
 
 
   //destroy_carne(carne);
-  destroy_prato(prato);
+  //destroy_prato(prato);
 
 
 }
@@ -133,7 +133,7 @@ void preparar_spaghetti(pedido_t p){
   //destroy_molho(molho);
   //destroy_bacon(bacon);
   //destroy_spaghetti(spaghetti);
-  destroy_prato(prato);
+  //destroy_prato(prato);
 }
 
 void preparar_sopa(pedido_t p){
@@ -169,7 +169,7 @@ void preparar_sopa(pedido_t p){
   sem_post(&sem_garcons);
 
   //destroy_agua(agua);
-  destroy_prato(prato);
+  //destroy_prato(prato);
   //destroy_legumes(legumes);
   //destroy_caldo(caldo);
 }

@@ -88,19 +88,28 @@ int main(int argc, char** argv) {
     int next_id = 1;
     int ret = 0;
     while((ret = scanf("%4095s", buf)) > 0) {
+        index++;
         pedido_t p = {next_id++, pedido_prato_from_name(buf)};
         if (!p.prato)
             fprintf(stderr, "Pedido inválido descartado: \"%s\"\n", buf);
         else {
+          /*Criada uma variavel local na memoria para poder passar o
+          valor sem que ele se perca*/
+          pedido_t* p2 = malloc(sizeof(pedido_t));
+          *p2 = p;
           pthread_t thread;
-          pthread_create(&thread, NULL, processar_pedido, &p);
+          pthread_create(&thread, NULL, processar_pedido, p2);
         }
             //processar_pedido(p);
     }
     if (ret != EOF) {
         perror("Erro lendo pedidos de stdin:");
     }
+    //aqui fazer algo para impedir que o programa acabe antes
+    //de terminar os pedidos
 
+    //linked list de semaforos
+    //pthread detach***
     free(buf);
 
     cozinha_destroy();
