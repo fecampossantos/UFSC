@@ -7,9 +7,6 @@
 
 #include "pedido.h"
 #include "cozinha.h"
-//#include "linked_list.h"
-
-// structures::LinkedList thread_list = new LinkedList();
 
 static struct option cmd_opts[] = {
     {"cozinheiros", required_argument, 0, 'c'},
@@ -107,9 +104,9 @@ int main(int argc, char** argv) {
           valor sem que ele se perca*/
           pedido_t* p2 = malloc(sizeof(pedido_t));
           *p2 = p;
-          //pthread_t thread;
+           
           if(threads_criadas == base) {
-            pthread_t* aux = realloc(lista_threads, (size_t) sizeof(pthread_t)*threads_criadas+10);
+            pthread_t* aux = realloc(lista_threads, (size_t) sizeof(pthread_t)*threads_criadas+5);
             if(!aux){
               printf("Error reallocating list");
             } else {
