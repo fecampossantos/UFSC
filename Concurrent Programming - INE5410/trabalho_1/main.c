@@ -93,7 +93,7 @@ int main(int argc, char** argv) {
     int next_id = 1;
     int ret = 0;
     int threads_criadas = 0;
-    int base = 5;
+    int base = 10;
 
 
     pthread_t* lista_threads = malloc(base * sizeof(pthread_t));
@@ -109,8 +109,13 @@ int main(int argc, char** argv) {
           *p2 = p;
           //pthread_t thread;
           if(threads_criadas == base) {
-            lista_threads = realloc(lista_threads, (size_t) sizeof(pthread_t)*threads_criadas);
-            base = threads_criadas;
+            pthread_t* aux = realloc(lista_threads, (size_t) sizeof(pthread_t)*threads_criadas+10);
+            if(!aux){
+              printf("Error reallocating list");
+            } else {
+              lista_threads = aux;
+              base = threads_criadas+5;
+            }
           }
           pthread_create(&lista_threads[threads_criadas], NULL, processar_pedido, p2);
           threads_criadas++;
