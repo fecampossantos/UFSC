@@ -82,11 +82,6 @@ void preparar_carne(pedido_t p){
   entregar_pedido(prato);
   sem_post(&sem_garcons);
 
-
-  //destroy_carne(carne);
-  //destroy_prato(prato);
-
-
 }
 
 void preparar_spaghetti(pedido_t p){
@@ -127,13 +122,6 @@ void preparar_spaghetti(pedido_t p){
   sem_wait(&sem_garcons);
   entregar_pedido(prato);
   sem_post(&sem_garcons);
-
-  //destroy_agua(agua);
-  //destroy_prato(prato);
-  //destroy_molho(molho);
-  //destroy_bacon(bacon);
-  //destroy_spaghetti(spaghetti);
-  //destroy_prato(prato);
 }
 
 void preparar_sopa(pedido_t p){
@@ -167,11 +155,6 @@ void preparar_sopa(pedido_t p){
   sem_wait(&sem_garcons);
   entregar_pedido(prato);
   sem_post(&sem_garcons);
-
-  //destroy_agua(agua);
-  //destroy_prato(prato);
-  //destroy_legumes(legumes);
-  //destroy_caldo(caldo);
 }
 
 

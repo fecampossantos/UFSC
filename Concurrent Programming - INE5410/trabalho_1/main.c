@@ -3,9 +3,13 @@
 #include <getopt.h>
 #include <errno.h>
 #include <string.h>
+#include <pthread.h>
+
 #include "pedido.h"
 #include "cozinha.h"
-#include <pthread.h>
+//#include "linked_list.h"
+
+// structures::LinkedList thread_list = new LinkedList();
 
 static struct option cmd_opts[] = {
     {"cozinheiros", required_argument, 0, 'c'},
@@ -38,6 +42,7 @@ void check_missing(int value, const char* name) {
     fprintf(stderr, "%s faltando!\n", name);
     abort();
 }
+
 
 int main(int argc, char** argv) {
     int bocas_total = 0, bocas = 4, frigideiras = 2, fogoes = 2,
@@ -87,8 +92,13 @@ int main(int argc, char** argv) {
     char* buf = (char*)malloc(4096);
     int next_id = 1;
     int ret = 0;
+    int threads_criadas = 0;
+    int base = 5;
+
+
+    pthread_t* lista_threads = malloc(base * sizeof(pthread_t));
+
     while((ret = scanf("%4095s", buf)) > 0) {
-        index++;
         pedido_t p = {next_id++, pedido_prato_from_name(buf)};
         if (!p.prato)
             fprintf(stderr, "Pedido inválido descartado: \"%s\"\n", buf);
@@ -97,29 +107,27 @@ int main(int argc, char** argv) {
           valor sem que ele se perca*/
           pedido_t* p2 = malloc(sizeof(pedido_t));
           *p2 = p;
-          pthread_t thread;
-          pthread_create(&thread, NULL, processar_pedido, p2);
+          //pthread_t thread;
+          if(threads_criadas == base) {
+            lista_threads = realloc(lista_threads, (size_t) sizeof(pthread_t)*threads_criadas);
+            base = threads_criadas;
+          }
+          pthread_create(&lista_threads[threads_criadas], NULL, processar_pedido, p2);
+          threads_criadas++;
         }
-            //processar_pedido(p);
     }
+
+    for(int i = 0; i < threads_criadas; i++){
+      pthread_join(lista_threads[i], NULL);
+    }
+
     if (ret != EOF) {
         perror("Erro lendo pedidos de stdin:");
     }
-    //aqui fazer algo para impedir que o programa acabe antes
-    //de terminar os pedidos
 
-    //linked list de semaforos
-    //pthread detach***
     free(buf);
-
+    free(lista_threads);
     cozinha_destroy();
 
     return 0;
-
-    /*
-      Garantir que, após o fim do main():
-        Não haja nenhuma outra thread em execução;
-        Não exista nenhum pedido em um estágio intermediário de produção ou já produzido mas não entregue;
-        Não podem haver memory leaks (use o AddressSanitizer para confirmar).
-    */
 }
