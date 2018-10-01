@@ -104,7 +104,7 @@ int main(int argc, char** argv) {
           valor sem que ele se perca*/
           pedido_t* p2 = malloc(sizeof(pedido_t));
           *p2 = p;
-           
+
           if(threads_criadas == base) {
             pthread_t* aux = realloc(lista_threads, (size_t) sizeof(pthread_t)*threads_criadas+5);
             if(!aux){
@@ -116,6 +116,7 @@ int main(int argc, char** argv) {
           }
           pthread_create(&lista_threads[threads_criadas], NULL, processar_pedido, p2);
           threads_criadas++;
+          free(p2);
         }
     }
 
