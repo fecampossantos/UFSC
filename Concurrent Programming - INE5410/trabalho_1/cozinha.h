@@ -121,6 +121,7 @@ void preparar_spaghetti(pedido_t p){
   //espera um garcom ficar livre
   sem_wait(&sem_garcons);
   entregar_pedido(prato);
+  destroy_agua(agua);
   sem_post(&sem_garcons);
 }
 
@@ -146,6 +147,7 @@ void preparar_sopa(pedido_t p){
   sem_post(&sem_bocas);
 
   prato_t* prato = create_prato(p);
+  empratar_sopa(legumes, caldo, prato);
   notificar_prato_no_balcao(prato);
   //inserir prato no buffer do balcao
 
