@@ -91,11 +91,12 @@ int main(int argc, char** argv) {
     int ret = 0;
     int threads_criadas = 0;
     int base = 10;
-    int pointer_num = 0; //tamanho do array de pointers
 
     pthread_t* lista_threads = malloc(base * sizeof(pthread_t));
-    pedido_t* pointers[pointer_num];
+    pedido_t* pointers = malloc(base * sizeof(pedido_t));
+
     int pointer_atual = 0;
+
     while((ret = scanf("%4095s", buf)) > 0) {
         pedido_t p = {next_id++, pedido_prato_from_name(buf)};
         if (!p.prato)
@@ -105,15 +106,17 @@ int main(int argc, char** argv) {
           valor sem que ele se perca*/
           pedido_t* p2 = malloc(sizeof(pedido_t));
           *p2 = p;
-          pointers[pointer_atual] = p2; //atribui o pointer na posicao atual do array de pointers
+          pointers[pointer_atual] = *p2; //atribui o pointer na posicao atual do array de pointers
           pointer_atual++;
 
           if(threads_criadas == base) {
             pthread_t* aux = realloc(lista_threads, (size_t) sizeof(pthread_t)*threads_criadas+5);
+            pedido_t* aux2 = realloc(pointers, (size_t) sizeof(pedido_t)*threads_criadas+5);
             if(!aux){
               printf("Error reallocating list");
             } else {
               lista_threads = aux;
+              pointers = aux2;
               base = threads_criadas+5;
             }
           }
@@ -130,9 +133,10 @@ int main(int argc, char** argv) {
     if (ret != EOF) {
         perror("Erro lendo pedidos de stdin:");
     }
-    for(int i = 0; i < pointer_num; i++){ //libera a memoria dos pointers de pedidos
-      free(pointers[i]);
-    }
+    //for(int i = 0; i < pointer_num; i++){ //libera a memoria dos pointers de pedidos
+      free(pointers);//[i]);
+      //free(aux2);//[i]);
+    //}
     free(buf);
     free(lista_threads);
     cozinha_destroy();
