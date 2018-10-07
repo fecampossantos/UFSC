@@ -1,111 +1,58 @@
 #include <iostream>
 #include <fstream>
 #include <string>
-#include <vector>
+#include <stdexcept>
+
+#include "ImageTreat.cpp"
+#include "ImageAnalyser.cpp"
 
 using namespace std;
 
-/*This method, when called, opens the file and gets the information
-on it, turning into a string and returning that.*/
-string fileToString(string xmlfilename){
-  string content;
-  char c;
 
-  ifstream file;
-  file.open(*xmlfilename);
+string readFile(string * name) {
+    ifstream file;
+    file.open(*name);
 
-  if (file.is_open()) {
-    while (file.get(c)) {
-      content += c;
+    if (file.is_open()) {
+        cout << "File opened successfully" << endl;
+    } else {
+      throw invalid_argument("Error opening file.");
     }
-  } else {
-    cout << "Error opening file";
-    exit(1);
-  }
 
-  file.close();
-  return content;
+    string content;
+    string line;
+    cout << "Reading content..." << endl;
+    while (getline(file, line)) {
+        content += line;
+    }
+    cout << "Content read!" << endl;
+    return content;
 }
 
-
-
 int main() {
-  char xmlfilename[100];
+  cout << "Enter with the file name: " << endl;
+  string file_name;
+  cin >> file_name;
+  string content = readFile(&file_name);
 
-  std::cin >> xmlfilename;  // entrada
+  file::Parser parser;
+  file::JoinImage* join_image = parser.parseFile(&content);
+  cout<<"File parsed! Continuing..."<<endl;
 
-  /*COLOQUE SEU CODIGO AQUI*/
-  //  open file
-  ifstream file;
-  file.open(*xmlfilename);
-  char read_char;
-  if (file.is_open()) {
-    //  start reading
-    std::string tag;
-    std::vector<string>* stack = new vector<string>[50]; //should we use malloc?
+  cout<<"Getting image"<<endl;
+  structure::Image* images = join_image->getImage();
 
-    //  reading logic
-    bool opening_tag = false, closing_tag = false;
-    while (file.get(read_char)) { //stack iterator
-      if (read_char == '<') {
+  cout<<"Analisying image"<<endl;
+  structure::Analyser* analyser; //= new structure::Analyser();
 
-        bool continue_reading = true;
-        while(continue_reading) {
-
-          if (read_char == '/') {
-            closing_tag = true;
-            opening_tag = false;
-          } else {
-            opening_tag = true;
-            closing_tag = false;
-          }
-
-           while (read_char != '>') {
-            tag += read_char;
-          }
-
-          /* If the last tag read is a closing tag, the tag before should be its opening tag.
-              CASE 1: It is the opening tag: both tag should be removed from the stack.
-              CASE 2: It it not the opening tag-> ACUSE ERROR
-            If it is a opening tag, it should just be pushed to the stack */
-
-          if (opening_tag) {
-            /*just insert into the stack */
-            stack->insert(tag);
-          } else if (closing_tag) {
-            string last_tag = stack->back();
-            if ('/'+last_tag == tag) {
-              /* The closing tag corresponds to the last opening tag,
-              so both of them should be removed. */
-            } else {
-              /* The closing tag doesn't corresponds to the last opening
-              tag, so there is an error! The program exits */
-              printf("No opening tag found for %s", tag);
-              exit(2);
-            }
-          }
-
-          continue_reading = false; //exits while, tag ended
-
-        } //  end while
-
-        //  out of the while
-        //  compares last read string
-
-        //  if both the tags are equal, continue program
-        //  if not, shows error
-
-      } else {
-        /*If the read char is not a '<', keep reading*/
-      }
-    }
-  } else {
-    printf("Error opening the file");
+  cout << "Number of images: " << join_image->getNumberImages() << endl ;
+  for (auto i = 0; i < join_image->getNumberImages(); i++) {
+      cout << "i: " << i << endl;
+      analyser->setImage(images);
+      cout << "Resultado da imagem " << i << ": " << analyser->qtdFormaConvexa() << endl;
   }
 
-  //std::cout << xmlfilename << std::endl;  // esta linha deve ser removida
+  //delete analyser;
 
-  file.close();
-  stack->clear();
   return 0;
 }
