@@ -1,172 +1,125 @@
-//! Copyright [2018] Felipe de Campos Santos
+//! Copyright [2018] <Copyright Owner>
 
-#include <cstdint>
+#ifndef STRUCTURES_LINKED_QUEUE_H
+#define STRUCTURES_LINKED_QUEUE_H
+
 #include <stdexcept>
 
 namespace structures {
 
-//! Linked queue
+//! ...
 template<typename T>
 class LinkedQueue {
  public:
-    LinkedQueue();
+    //! ...
+    LinkedQueue() {}
+    //! ...
+    ~LinkedQueue() {
+        this->clear();
+    }
+    //! ...
+    void clear() {
+        Node * aux;
+        for (int i = 0; i < this->size_; i++) {
+            aux = this->head->next();
+            delete this->head;
+            this->head = aux;
+        }
+        this->size_ = 0;
+    }
+    //! ...
+    void enqueue(const T& data) {
+        if (this->size_ == 0) {
+            this->head = new Node(data);
+            this->tail = this->head;
+            this->size_ += 1;
+            return;
+        }
 
-    ~LinkedQueue();
-
-    //! clear
-    void clear();
-
-    //! push
-    void enqueue(const T& data);
-
-    //! pop
-    T dequeue();
-
-    //! returns the first data
-    T& front() const;
-
-    //! returns the last data
-    T& back() const;
-
-    //! returns true if empty, false otherwise
-    bool empty() const;
-
-    //! returns size
-    std::size_t size() const;
+        Node * aux = this->head;
+        for (int i = 0; i < this->size_ - 1; i++) {
+            if (!aux->next()) {
+                break;
+            }
+            aux = aux->next();
+        }
+        aux->next(new Node(data));
+        this->tail = aux->next();
+        this->size_ += 1;
+        return;
+    }
+    //! ...
+    T dequeue() {
+        if (this->size_ == 0) {
+            throw std::out_of_range("Lista Vazia");
+        }
+        T value = this->head->data();
+        Node * aux = this->head->next();
+        delete this->head;
+        this->head = aux;
+        this->size_ += -1;
+        return value;
+    }
+    //! ...
+    T& front() const {
+        if (this->size_ == 0) {
+            throw std::out_of_range("Lista Vazia");
+        }
+        return this->head->data();
+    }
+    //! ...
+    T& back() const {
+        if (this->size_ == 0) {
+            throw std::out_of_range("Lista Vazia");
+        }
+        return this->tail->data();
+    }
+    //! ...
+    bool empty() const {
+        return (this->size_ == 0);
+    }
+    //! ...
+    std::size_t size() const {
+        return this->size_;
+    }
 
  private:
-    class Node {
+    class Node {  // Elemento
      public:
-        explicit Node(const T& data):
-            data_{data}
-        {}
-        Node(const T& data, Node* next):
-            data_{data},
-            next_{next}
-        {}
+        explicit Node(const T& data): data_{data} {}
 
-        Node* next() {
-            return next_;
-        }
-        const Node* next() const {
-            return next_;
-        }
+        Node(const T& data, Node* next): data_{data}, next_{next} {}
 
-        void next(Node* next) {
-            next_ = next;
-        }
-
-        T& data() {
+        T& data() {  // getter: dado
             return data_;
         }
-        const T& data() const {
+
+        const T& data() const {  // getter const: dado
             return data_;
+        }
+
+        Node* next() {  // getter: próximo
+            return next_;
+        }
+
+        const Node* next() const {  // getter const: próximo
+            return next_;
+        }
+
+        void next(Node* node) {  // setter: próximo
+            next_ = node;
         }
 
      private:
         T data_;
-        Node* next_;
+        Node* next_{nullptr};
     };
 
-    //! head
-    Node* head = nullptr;
-
-    //! tail
-    Node* tail = nullptr;
-
-    //! size
-    std::size_t size_{0u};
+    Node* head{nullptr};  // nodo-cabeça
+    Node* tail{nullptr};  // nodo-fim
+    std::size_t size_{0u};  // tamanho
 };
 
-    //!!  constructor
-    template <typename T>
-    LinkedQueue<T>::LinkedQueue() {
-        size_ = 0;
-        head = nullptr;
-        tail = nullptr;
-    }
+}  // namespace structures
 
-    //!!  deletes the queue
-    template  <typename T>
-    LinkedQueue<T>::~LinkedQueue() {
-        if (!empty()) {
-            clear();
-        }
-    }
-
-    //!!  clears the queue
-    template <typename T>
-    void LinkedQueue<T>::clear() {
-        size_ = 0;
-        head = nullptr;
-        tail = nullptr;
-    }
-
-    //!!  push
-    template <typename T>
-    void LinkedQueue<T>::enqueue(const T &data) {
-        Node *nd = new Node(data, nullptr);
-        if (empty()) {
-            head = nd;
-            tail = head;
-        }
-        tail ->next(nd);
-        tail= tail->next();
-        size_++;
-    }
-
-    //!!  pop
-    template  <typename T>
-    T LinkedQueue<T>::dequeue() {
-        if (empty()) {
-            throw std::out_of_range("Fila vazia");
-        }
-        Node *out;
-        T ret;
-        out = head;
-        ret = out->data();
-        head = out->next();
-        if (size_ == 1) {
-            tail = nullptr;
-        }
-        size_--;
-        delete out;
-        return ret;
-    }
-
-    //!!  returns the first element
-    template  <typename T>
-    T& LinkedQueue<T>::front() const {
-        if (empty()) {
-            throw std::out_of_range("Fila vazia");
-        }
-        return head->data();
-    }
-
-    //!!  returns the last element
-    template <typename T>
-    T& LinkedQueue<T>::back() const {
-        if (empty()) {
-            throw std::out_of_range("Fila vazia");
-        }
-        return tail->data();
-    }
-
-    //!!  returns true if empty
-    template  <typename T>
-    bool LinkedQueue<T>::empty() const {
-        if (head == nullptr && tail == nullptr) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    //!!  returns size
-    template <typename T>
-    std::size_t LinkedQueue<T>::size() const {
-        return size_;
-    }
-
-
-}  //! namespace structures
+#endif

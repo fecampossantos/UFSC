@@ -1,3 +1,6 @@
+//Copyright [2018]
+//Alunos: Arthur Machado Capaverde, Felipe de Campos Santos
+
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -14,18 +17,18 @@ string readFile(string * name) {
     file.open(*name);
 
     if (file.is_open()) {
-        cout << "File opened successfully" << endl;
+        //cout << "File opened successfully" << endl;
     } else {
       throw invalid_argument("Error opening file.");
     }
 
     string content;
     string line;
-    cout << "Reading content..." << endl;
+    //cout << "Reading content..." << endl;
     while (getline(file, line)) {
         content += line;
     }
-    cout << "Content read!" << endl;
+    //cout << "Content read!" << endl;
     return content;
 }
 
@@ -37,22 +40,21 @@ int main() {
 
   file::Parser parser;
   file::JoinImage* join_image = parser.parseFile(&content);
-  cout<<"File parsed! Continuing..."<<endl;
+  //cout<<"File parsed! Continuing..."<<endl;
 
-  cout<<"Getting image"<<endl;
+  //cout<<"Getting image"<<endl;
   structure::Image* images = join_image->getImage();
 
-  cout<<"Analisying image"<<endl;
-  structure::Analyser* analyser; //= new structure::Analyser();
+  //cout<<"Analisying image"<<endl;
+  structure::Analyser* analyser = new structure::Analyser();
 
-  cout << "Number of images: " << join_image->getNumberImages() << endl ;
   for (auto i = 0; i < join_image->getNumberImages(); i++) {
-      cout << "i: " << i << endl;
-      analyser->setImage(images);
-      cout << "Resultado da imagem " << i << ": " << analyser->qtdFormaConvexa() << endl;
+      analyser->setImage(&images[i]);
+      cout << images[i].getName() << " " << analyser->qtdFormaConvexa() << endl;
+      //cout << "Resultado da imagem " << i << ": " << analyser->qtdFormaConvexa() << endl;
   }
 
-  //delete analyser;
+  delete analyser;
 
   return 0;
 }

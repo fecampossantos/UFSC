@@ -6,6 +6,8 @@
 #include <string>
 #include <iostream>
 
+using namespace std;
+
 namespace structure {
 
   class Image {
@@ -109,7 +111,6 @@ namespace structure {
             void verificaArredores(int * clone) {
                 while(!this->fila.empty()) {
                     coord::Location aux = this->fila.dequeue();
-
                     int auxLinha = aux.getX() * this->largura;
 
                     // Linha de cima/baixo
@@ -128,7 +129,6 @@ namespace structure {
                     if (clone[coordenadaAtual] == 0) {
                         this->fila.enqueue(*(new coord::Location(i, j)));
                         clone[coordenadaAtual] = this->qtd;
-
                         verificaArredores(clone);
                         this->qtd++;
                     }
@@ -141,10 +141,9 @@ namespace structure {
 
                 int coordenadaAtual = 0;
                 for (int i = 0; i < this->altura; i++) {
+
                     for (int j = 0; j < this->largura; j++) {
-
                         coordenadaAtual = (i * this->largura) + j;
-
                         verificaSePixelPreto(clone, coordenadaAtual, i, j);
                     }
                 }
