@@ -27,7 +27,7 @@ namespace file {
               this->image = image;
           }
 
-          structure::Image * getImage() {
+          structure::Image* getImage() {
               return this->image;
           }
 
@@ -36,7 +36,7 @@ namespace file {
               return this->numberImages;
           }
       private:
-          structure::Image * image;
+          structure::Image* image;
           int numberImages;
         };
 
@@ -46,7 +46,6 @@ namespace file {
             Parser() {}
 
             int countTags(std::string tag, std::string * content) {
-              cout << "Counting how many " << tag << " are there in file content..." << endl;
               int count = 0;
               int position = content->find(tag, 0);  //  returns -1 if not found
               while(position >= 0) {
@@ -58,7 +57,6 @@ namespace file {
 
 
             std::string getBetweenTags(std::string tag,std::string * content) {
-              cout << "Getting what is between the " << tag << " tags..." << endl;
 
               int startIndex = content->find(tag) + tag.length();
               int endIndex = content->find(tag.insert(1, "/"));
@@ -72,22 +70,19 @@ namespace file {
                 std::string data = getBetweenTags("<data>", &tag);
                 int width =  std::stoi(getBetweenTags("<width>", &tag));
                 int height = std::stoi(getBetweenTags("<height>", &tag));
-                cout << "Creating Image(name, width, height, data) with attributes ("<<name<<", "<<width<<", "<<height<<", data)"<<endl;
                 return new structure::Image(name, width, height, data);
             }
 
 
             file::JoinImage * parseFile(std::string * content) {
-              cout << "Starting parse process..." << endl;
+              //cout << "Starting parse process..." << endl;
 
               this->checkValid(content);
 
-              cout << "Counting how many images are there in the file" << endl;
               int number_images = countTags("<img>", content);
-              cout<<"There are "<<number_images<<" images on the file."<<endl;
+              //cout<<"There are "<<number_images<<" images on the file."<<endl;
 
-              cout << "Creating array of images..." << endl;
-              structure::Image * images = new structure::Image[number_images];
+              structure::Image* images = new structure::Image[number_images];
 
               int i = 0;
               std::string aux = *content;
@@ -109,7 +104,7 @@ namespace file {
 
 
             bool checkValid(std::string * content) {
-              cout << "Checking if file is valid (if all open tags were closed) ..." << endl;
+              //cout << "Checking if file is valid (if all open tags were closed) ..." << endl;
 
               structures::LinkedStack<std::string> stack;
 
@@ -130,7 +125,8 @@ namespace file {
                           std::string last_tag = stack.pop();
 
                           if (last_tag.compare(aux.substr(1, aux.length() - 1)) != 0) {
-                              throw std::invalid_argument("Invalid file! Some tag is missing.");
+                                std::cout << "error" << std::endl;
+                                exit(1);
                           }
 
                       }
@@ -145,11 +141,16 @@ namespace file {
                   }
               }
 
-              if (stack.empty()) {
-                cout << "Valid file! Continuing..." << endl;
+              if (!stack.empty()) {
+                //cout << "Valid file! Continuing..." << endl;
                 return true;
               } else {
-                return false;
+                //throw std::out_of_range("error");
+                std::cout << "error" << std::endl;
+                //printf("error");
+                exit;
+                //return 1;
+                //return false;
               }
           }
     };
