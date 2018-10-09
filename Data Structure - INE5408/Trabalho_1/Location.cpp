@@ -2,19 +2,7 @@
 #define MODEL_COORDENADA
 
 namespace coord {
-
-  /**
-           *  Retorna o conteudo de uma tag XML
-           *  Considera somente a primeira ocorrência
-           *
-           * @param substr ponteiro para string
-           *      Ponteiro para string que deve ser procurada a tag
-           * @param tag string
-           *      Tag a ser procurada.
-           *      Deve ser uma string do no formato "<tag>"
-           * @return string
-           *      Uma string com o conteudo
-          */
+  
     /**
     *   classe para criação de um objeto com dois ints
     *   representando uma coordenada
