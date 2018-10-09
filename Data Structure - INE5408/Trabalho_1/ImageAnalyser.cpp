@@ -27,9 +27,6 @@ namespace structure {
           *
           *   @param string name, int width, int height, string data
           *         nome da imagem, largura, altura e o conteudo
-          *
-          *   @return Image
-          *       retorna imagem
           **/
           Image(std::string name, int width, int height, std::string data) {
               this->name = name;
