@@ -12,6 +12,15 @@
 using namespace std;
 
 
+/**
+*   metodo abre o arquivo e transforma seu conteudo numa string
+*
+*   @param string
+*       recebe o nome do arquivo
+*
+*   @return string
+*       retorna o conteudo do arquivo
+**/
 string readFile(string * name) {
     ifstream file;
     file.open(*name);
@@ -32,6 +41,13 @@ string readFile(string * name) {
     return content;
 }
 
+
+/**
+*   metodo principal do programa, coordena o funcionamento
+*
+*   @return int
+*       retorna 0, para fechar o programa
+**/
 int main() {
   cout << "Enter with the file name: " << endl;
   string file_name;
@@ -50,8 +66,8 @@ int main() {
 
   for (auto i = 0; i < join_image->getNumberImages(); i++) {
       analyser->setImage(&images[i]);
-      cout << images[i].getName() << " " << analyser->qtdFormaConvexa() << endl;
-      //cout << "Resultado da imagem " << i << ": " << analyser->qtdFormaConvexa() << endl;
+      cout << images[i].getName() << " " << analyser->amountConected() << endl;
+      //cout << "Resultado da imagem " << i << ": " << analyser->amountConected() << endl;
   }
 
   delete analyser;

@@ -12,46 +12,52 @@ using namespace std;
 
 namespace file {
 
-            /**
-            *   Classe para receber as imagens e armazenar os arquivos png e sua quantidade
-            **/
+  /**
+  *   classe que junta uma imagem com o numero de imagens do arquivo
+  **/
   class JoinImage {
       public:
-	          /**
-            *   Construtor vazio
-            **/
+        /**
+        *   construtor vazio
+        **/
           JoinImage() {}
 
-	    /**
-      *   Método set para o número de imagens
-	    *
-	    * @param int total
-	    * 	número de imagens
-            **/
+          /**
+          *   metodo que altera o numero de imagens
+          *
+          *   @param int
+          *     int com o total de imagens
+          **/
           void setNumberImages(int total) {
               this->numberImages = total;
           }
 
-	    /**
-      *   Método set para a imagem
-	    *
-	    * @param structure::Image image[]
-	    * 	define um array de imagens como o atributo imagem de JoinImage
-            **/
+          /**
+          *   metodo que altera a imagen
+          *
+          *   @param Image
+          *     objeto Image
+          **/
           void setImage(structure::Image image[]) {
               this->image = image;
           }
-	  
-	          /**
-            *   Método retorna a imagem de JoinImage
-            **/
+
+          /**
+          *   metodo que retorna a imagem
+          *
+          *   @return Image*
+          *     retorna um ponteiro para a imagem
+          **/
           structure::Image* getImage() {
               return this->image;
           }
 
-	          /**
-            *   Método retorna o número de imagens em JoinImage
-            **/
+          /**
+          *   metodo que retorna o numero de imagens
+          *
+          *   @return int
+          *     retorna uint com o numero de imagens
+          **/
           int getNumberImages() {
               return this->numberImages;
           }
@@ -59,20 +65,27 @@ namespace file {
           structure::Image* image;
           int numberImages;
         };
-    
-            /**
-            *   Classe responsável pela validação dos datasets e contagem de sua quantidade
-            *   de imagens através da análise das tags
-            **/
+
+
+      /**
+      *   classe que faz a leitura e avaliacao do arquivo
+      **/
     class Parser {
         public:
+
             /**
-            *   Construtor vazio
+            *   construtor vazio
             **/
             Parser() {}
-            
+
             /**
-            *   
+            *   metodo que conta quantas especificas tags tem no arquivo
+            *
+            *   @param string tag, string* content
+            *     recebe uma tag (no formato "<xxx>") e um ponteiro para o conteudo
+            *
+            *   @return int
+            *       retorna o numero de tags
             **/
             int countTags(std::string tag, std::string * content) {
               int count = 0;
@@ -85,7 +98,13 @@ namespace file {
             }
 
             /**
-            *   Método que retorna a string de dados entre uma tag e seu fechamento </tag>
+            *   metodo que coleta o que existe entre tags especificas
+            *
+            *   @param string, string*
+            *       recebe a tag (no formato "<xxx>") e um ponteiro para o conteudo do arquivo
+            *
+            *   @return string
+            *     retorna uma string com o conteudo da tag
             **/
             std::string getBetweenTags(std::string tag,std::string * content) {
 
@@ -94,12 +113,18 @@ namespace file {
 
               return content->substr(startIndex, endIndex - startIndex);
             }
-            
+
             /**
-            *   Método para analisar a imagem e receber seus dados principais
+            *   metodo que coleta toda informacao da imagem
+            *
+            *   @param string*
+            *       recebe um ponteiro para o conteudo
+
+            *   @return Image*
+            *     retorna um ponteiro para a imagem ja com as informacoes
             **/
-            structure::Image * serializeImage(std::string * buffer) {
-                std::string tag = getBetweenTags("<img>", buffer);
+            structure::Image * serializeImage(std::string * content) {
+                std::string tag = getBetweenTags("<img>", content);
                 std::string name = getBetweenTags("<name>", &tag);
                 std::string data = getBetweenTags("<data>", &tag);
                 int width =  std::stoi(getBetweenTags("<width>", &tag));
@@ -108,8 +133,13 @@ namespace file {
             }
 
             /**
-            *   Método parse para validar um arquivo, e analisar seu conteúdo para retornar um 
-            *   arquivo JoinImage com a quantidade de imagens e as próprias imagens
+            *   metodo que faz o parse (pedido no exercicio)
+            *
+            *   @param string*
+            *      recebe um ponteiro para o conteudo da tag
+            *
+            *   @return JoinImage*
+            *     retorna um ponteiro para um objeto JoinImage, ja com a image e o numero total de imagens
             **/
             file::JoinImage * parseFile(std::string * content) {
               //cout << "Starting parse process..." << endl;
@@ -139,8 +169,15 @@ namespace file {
               return finalImage;
             }
 
+
             /**
-            *   Método de validação de arquivos através da manipulação de tags em uma pilha (ArrayStack)
+            *   metodo que faz a verificacao da abertura e fechamento das tags
+            *
+            *   @param string*
+            *       recebe um ponteiro para o conteudo do arquivo
+            *
+            *   @return bool
+            *     retorna TRUE se o arquivo for valido, FALSE caso contrario
             **/
             bool checkValid(std::string * content) {
               //cout << "Checking if file is valid (if all open tags were closed) ..." << endl;
@@ -184,12 +221,7 @@ namespace file {
                 //cout << "Valid file! Continuing..." << endl;
                 return true;
               } else {
-                //throw std::out_of_range("error");
                 std::cout << "error" << std::endl;
-                //printf("error");
-                exit;
-                //return 1;
-                //return false;
               }
           }
     };
