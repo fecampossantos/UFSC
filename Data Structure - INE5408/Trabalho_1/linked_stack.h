@@ -1,65 +1,152 @@
-#ifndef MODEL_COORDENADA
-#define MODEL_COORDENADA
+//! Copyright [2018] Felipe de Campos Santos
 
-namespace coord {
+#include <cstdint>
+#include <stdexcept>
 
-  /**
-           *  Retorna o conteudo de uma tag XML
-           *  Considera somente a primeira ocorrência
-           *
-           * @param substr ponteiro para string
-           *      Ponteiro para string que deve ser procurada a tag
-           * @param tag string
-           *      Tag a ser procurada.
-           *      Deve ser uma string do no formato "<tag>"
-           * @return string
-           *      Uma string com o conteudo
-          */
-    /**
-    *   classe para criação de um objeto com dois ints
-    *   representando uma coordenada
-    **/
-    class Location {
-        public:
-            /**
-            *   Construtor vazio
-            **/
-            Location() {}
+namespace structures {
 
-            /**
-            *   construtor com pametros
-            *
-            *   @param x int, y int
-            *       representam as coordenadas
-            **/
-            Location(int x, int y) {
-                this->x = x;
-                this->y = y;
+//!
+template<typename T>
+
+//!!  linked stack
+class LinkedStack {
+ public:
+        LinkedStack();
+
+        ~LinkedStack();
+
+        //! clear
+        void clear();
+
+        //! push
+        void push(const T& data);
+
+        //! pop
+        T pop();
+
+        //! top
+        T& top() const;
+
+        //! empty
+        bool empty() const;
+
+        //! ize
+        std::size_t size() const;
+
+ private:
+        class Node {
+         public:
+            explicit Node(const T& data):
+                data_{data}
+            {}
+            Node(const T& data, Node* next):
+                data_{data},
+                next_{next}
+            {}
+
+            //! get data
+            T& data() {
+                return data_;
             }
 
-            /**
-            *   metodo que retorna a coordenada x
-            *
-            *   @return int
-            *       retorna x
-            **/
-            int getX() {
-                return this->x;
+            //!  get data const
+            const T& data() const {
+                return data_;
             }
 
-            /**
-            *   metodo que retorna a coordenada y
-            *
-            *   @return int
-            *       retorna y
-            **/
-            int getY() {
-                return this->y;
+            //!  get next
+            Node* next() {
+                return next_;
             }
-        private:
-            int x;
-            int y;
-    };
-}
 
-#endif
+            //!  get next const
+            const Node* next() const {
+                return next_;
+            }
+
+            //!  set next
+            void next(Node* next) {
+                next_ = next;
+            }
+
+         private:
+            T data_;
+            Node* next_;
+        };
+
+         //!  top
+        Node* top_ = nullptr;
+
+        //!! size
+        std::size_t size_{0u};
+};
+    //!!
+    template <typename T>
+    LinkedStack<T>::LinkedStack() {
+        top_ = nullptr;
+        size_ = 0;
+    }
+
+    //!!
+    template <typename T>
+    LinkedStack<T>::~LinkedStack() {
+        if (!empty()) {
+            clear();
+        }
+    }
+
+    //!!
+    template <typename T>
+    void LinkedStack<T>::clear() {
+        size_= 0;
+    }
+
+    //!!
+    template <typename T>
+    void LinkedStack<T>::push(const T &data) {  //!
+        Node* nd = new Node(data, nullptr);
+        nd->next(top_);
+        top_ = nd;
+        size_++;
+    }
+
+    //!!
+    template <typename T>
+    T LinkedStack<T>::pop() {  //!
+        if (empty()) {
+            throw std::out_of_range("Empty");
+        }
+        auto out = top_;
+        T data = out->data();
+        top_ = out->next();
+        size_--;
+        delete out;
+        return data;
+    }
+
+    //!!
+    template  <typename T>
+    T& LinkedStack<T>::top() const {
+        if (empty()) {
+            throw std::out_of_range("Empty ");
+        }
+        return top_->data();
+    }
+
+    //!!
+    template <typename T>
+    bool LinkedStack<T>::empty() const {
+        if (size_ == 0) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    //!!
+    template <typename T>
+    std::size_t LinkedStack<T>::size() const {
+        return size_;
+    }
+
+}  //! namespace structures
