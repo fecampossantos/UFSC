@@ -10,12 +10,27 @@ using namespace std;
 
 namespace structure {
 
+  /**
+  *   classe que cria e altera imagens
+  **/
   class Image {
       public:
 
+        /**
+        *   construtor vazio
+        **/
           Image() {}
 
 
+          /**
+          *   construtor com parametros
+          *
+          *   @param string name, int width, int height, string data
+          *         nome da imagem, largura, altura e o conteudo
+          *
+          *   @return Image
+          *       retorna imagem
+          **/
           Image(std::string name, int width, int height, std::string data) {
               this->name = name;
               this->width = width;
@@ -24,21 +39,42 @@ namespace structure {
           }
 
 
+          /**
+          *   metodo que retorna o nome da imagem
+          *
+          *   @return string
+          *       retorna name
+          **/
           std::string getName() {
             return this->name;
           }
 
-
+          /**
+          *   metodo que retorna a largura da imagem
+          *
+          *   @return int
+          *       retorna width
+          **/
           int getWidth() {
               return this->width;
           }
 
-
+          /**
+          *   metodo que retorna a altura da imagem
+          *
+          *   @return int
+          *       retorna height
+          **/
           int getHeight() {
               return this->height;
           }
 
-
+          /**
+          *   metodo que retorna o conteudo da imagem
+          *
+          *   @return string
+          *       retorna data
+          **/
           std::string getData() {
               return this->data;
           }
@@ -50,114 +86,171 @@ namespace structure {
   };
 
 
-
+  /**
+  *  classe com metodos que analisam o conteudo da imagem
+  **/
     class Analyser {
         public:
 
+            /**
+            *   construtor vazio
+            **/
             Analyser() {}
 
-
+            /**
+            *   construtor com parametros
+            *
+            *   @param Image* image
+            *       recebe um ponteiro para objeto imagem
+            **/
             void setImage(structure::Image * image) {
-                this->largura = image->getWidth();
-                this->altura = image->getHeight();
+                this->width1 = image->getWidth();
+                this->height1 = image->getHeight();
                 this->data = image->getData();
-                this->qtd = 1;
+                this->rotulo = 1;
             }
 
-
-            void nextLine(coord::Location * aux, int * clone, int * auxLinha) {
+            /**
+            *   metodo que altera a matriz R a partir da linha seguinte
+            *
+            *   @param Location*, int*, int*
+            *       recebe um ponteiro para objeto location, um Ponteiro
+            *       para a matriz E e um ponteiro para linha
+            **/
+            void lineAfter(coord::Location * aux, int * clone, int * auxLinha) {
                     int line = aux->getX() + 1;
-                    if (line < this->altura) {
-                        int pos = *auxLinha + this->largura + aux->getY();
-                        this->alteraClone(clone, line, aux->getY(), pos);
+                    if (line < this->height1) {
+                        int pos = *auxLinha + this->width1 + aux->getY();
+                        this->editMatrixE(clone, line, aux->getY(), pos);
                     }
             }
 
 
-            void beforeLine(coord::Location * aux, int * clone, int * auxLinha) {
+            /**
+            *   metodo que altera a matriz R a partir da linha anterior
+            *
+            *   @param Location*, int*, int*
+            *       recebe um ponteiro para objeto location, um Ponteiro
+            *       para a matriz E e um ponteiro para linha
+            **/
+            void lineBefore(coord::Location * aux, int * clone, int * auxLinha) {
                     int novaLinha = aux->getX() - 1;
                     if (novaLinha > -1) {
-                        int pos = *auxLinha - this->largura + aux->getY();
-                        this->alteraClone(clone, novaLinha, aux->getY(), pos);
+                        int pos = *auxLinha - this->width1 + aux->getY();
+                        this->editMatrixE(clone, novaLinha, aux->getY(), pos);
                     }
             }
 
 
-            void nextColumn(coord::Location * aux, int * clone, int * auxLinha) {
+            /**
+            *   metodo que altera a matriz R a partir da coluna seguinte
+            *
+            *   @param Location*, int*, int*
+            *       recebe um ponteiro para objeto location, um Ponteiro
+            *       para a matriz E e um ponteiro para linha
+            **/
+            void columnAfter(coord::Location * aux, int * clone, int * auxLinha) {
                     int col = aux->getY() + 1;
-                    if (col < this->largura) {
+                    if (col < this->width1) {
                         int pos = *auxLinha + col;
-                        this->alteraClone(clone, aux->getX(), col, pos);
+                        this->editMatrixE(clone, aux->getX(), col, pos);
                     }
             }
 
 
-            void previousColumn(coord::Location * aux, int * clone, int * auxLinha) {
+            /**
+            *   metodo que altera a matriz R a partir da coluna anterior
+            *
+            *   @param Location*, int*, int*
+            *       recebe um ponteiro para objeto location, um Ponteiro
+            *       para a matriz E e um ponteiro para linha
+            **/
+            void columnBefore(coord::Location * aux, int * clone, int * auxLinha) {
                     int col = aux->getY() - 1;
                     if (col > -1) {
                         int pos = *auxLinha + col;
-                        this->alteraClone(clone, aux->getX(), col, pos);
+                        this->editMatrixE(clone, aux->getX(), col, pos);
                     }
             }
 
 
-            void alteraClone(int * clone, int i, int j, int pos) {
+            /**
+            *   metodo que altera a matriz R com base na matriz E lida
+            *
+            *   @param int*, int, int, int
+            *       recebe um ponteiro e as posicoes
+            **/
+            void editMatrixE(int * clone, int i, int j, int pos) {
                 if (this->data.at(pos) == *"1" && clone[pos] == 0) {
-                    this->fila.enqueue(*(new coord::Location(i, j)));
-                    clone[pos] = this->qtd;
+                    this->queue.enqueue(*(new coord::Location(i, j)));
+                    clone[pos] = this->rotulo;
                 }
             }
 
-            void verificaArredores(int * clone) {
-                while(!this->fila.empty()) {
-                    coord::Location aux = this->fila.dequeue();
-                    int auxLinha = aux.getX() * this->largura;
+            /**
+            *   metodo que verifica os vizinhos
+            *
+            *   @param int*
+            *       recebe um ponteiro para a matriz R
+            **/
+            void checkNeighbors(int * clone) {
+                while(!this->queue.empty()) {
+                    coord::Location aux = this->queue.dequeue();
+                    int auxLinha = aux.getX() * this->width1;
 
-                    // Linha de cima/baixo
-                    this->nextLine(&aux, clone, &auxLinha);
-                    this->beforeLine(&aux, clone, &auxLinha);
-
-                    // Coluna da frente/trás
-                    this->nextColumn(&aux, clone, &auxLinha);
-                    this->previousColumn(&aux, clone, &auxLinha);
+                    this->lineAfter(&aux, clone, &auxLinha);
+                    this->lineBefore(&aux, clone, &auxLinha);
+                    this->columnAfter(&aux, clone, &auxLinha);
+                    this->columnBefore(&aux, clone, &auxLinha);
 
                 }
             }
 
-            void verificaSePixelPreto(int * clone, int coordenadaAtual, int i, int j) {
+            /**
+            *   metodo que checa se o "pixel" é branco ou preto (1 ou 0)
+            *
+            *   @param int*, int, int, int
+            *       recebe um objeto location
+            **/
+            void checkPixel(int * clone, int coordenadaAtual, int i, int j) {
                 if (data.at(coordenadaAtual) == *"1") {
                     if (clone[coordenadaAtual] == 0) {
-                        this->fila.enqueue(*(new coord::Location(i, j)));
-                        clone[coordenadaAtual] = this->qtd;
-                        verificaArredores(clone);
-                        this->qtd++;
+                        this->queue.enqueue(*(new coord::Location(i, j)));
+                        clone[coordenadaAtual] = this->rotulo;
+                        checkNeighbors(clone);
+                        this->rotulo++;
                     }
                 }
             }
 
-
-            int qtdFormaConvexa() {
-                int * clone = new int[this->largura * this->altura]{};
+            /*
+            *   metodo que conta quantos elementos conexos existem
+            *
+            *   @return int
+            *       retorna o numero de elementos conexos
+            */
+            int amountConected() {
+                int * clone = new int[this->width1 * this->height1]{};
 
                 int coordenadaAtual = 0;
-                for (int i = 0; i < this->altura; i++) {
+                for (int i = 0; i < this->height1; i++) {
 
-                    for (int j = 0; j < this->largura; j++) {
-                        coordenadaAtual = (i * this->largura) + j;
-                        verificaSePixelPreto(clone, coordenadaAtual, i, j);
+                    for (int j = 0; j < this->width1; j++) {
+                        coordenadaAtual = (i * this->width1) + j;
+                        checkPixel(clone, coordenadaAtual, i, j);
                     }
                 }
 
                 delete [] clone;
 
-                return this->qtd - 1;
+                return this->rotulo - 1;
             }
 
         private:
-            structures::LinkedQueue<coord::Location> fila;
-            int largura;
-            int altura;
-            int qtd;
+            structures::LinkedQueue<coord::Location> queue;
+            int width1;
+            int height1;
+            int rotulo;
             std::string data;
     };
 }

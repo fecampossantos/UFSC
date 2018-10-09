@@ -1,5 +1,3 @@
-//! Copyright [2018] <Copyright Owner>
-
 #ifndef STRUCTURES_LINKED_QUEUE_H
 #define STRUCTURES_LINKED_QUEUE_H
 
