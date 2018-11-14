@@ -44,27 +44,49 @@ public class OrderBook implements AutoCloseable {
             order.notifyCancellation();
             return;
         }
+
+        //linkedblockling
         (order.getType() == BUY ? buyOrders : sellOrders).add(order);
+
+
         order.notifyQueued();
         tryMatch();
     }
 
     private void tryMatch() {
-        Order sell, buy;
-        while ((sell = sellOrders.peek()) != null && (buy = buyOrders.peek()) != null) {
-            if (sell.getPrice() <= buy.getPrice()) {
-                Transaction trans = new Transaction(sell, buy);
-                sell.notifyProcessing();
-                buy.notifyProcessing();
-                transactionProcessor.process(OrderBook.this, trans);
-                Order removed = sellOrders.remove();
-                assert removed == sell;
-                removed = buyOrders.remove();
-                assert removed == buy;
-            } else {
-                break;
+
+        // quando chamado paralelamente, ter cuidado para que cada
+        // thread pegue um buyorder e um sellorder que ja nao
+        // estejam sendo "tratados" por outra thread
+
+        Runnable runnable = new Runnable() {
+            @Override
+            public void run() {
+                Order sell, buy;
+
+                while ((sell = sellOrders.peek()) != null && (buy = buyOrders.peek()) != null) {
+                    if (sell.getPrice() <= buy.getPrice()) {
+                        //thread
+                        //lock
+                        Transaction trans = new Transaction(sell, buy);
+                        Order removed = sellOrders.remove();
+                        assert removed == sell;
+                        removed = buyOrders.remove();
+                        assert removed == buy;
+                        //unlock
+
+                        sell.notifyProcessing();
+                        buy.notifyProcessing();
+                        transactionProcessor.process(OrderBook.this, trans);
+                    } else {
+                        break;
+                    }
+                }
             }
-        }
+        };
+
+        new Thread(runnable).start();
+
     }
 
     @Override
